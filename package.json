@@ -2,25 +2,29 @@
   "name": "manga-translator-oss",
   "version": "1.0.0",
   "description": "Privacy-first, open-source manga translator browser extension",
-  "main": "index.js",
+  "type": "module",
   "scripts": {
-    "build": "echo 'Build complete - load extension from dist/'",
-    "lint": "echo 'Lint passed'",
-    "typecheck": "echo 'Type check passed'"
-  },
-  "keywords": [
-    "manga",
-    "translator",
-    "ocr",
-    "chrome-extension",
-    "tesseract"
-  ],
-  "author": "dropmoltbot",
-  "license": "MIT",
-  "devDependencies": {
-    "typescript": "^5.0.0"
+    "dev": "vite",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "format": "biome format --write ."
   },
   "dependencies": {
-    "tesseract.js": "^5.0.0"
+    "dompurify": "^3.0.9",
+    "tesseract.js": "^5.0.4",
+    "webextension-polyfill": "^0.10.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.5.3",
+    "@crxjs/vite-plugin": "^2.0.0-beta.21",
+    "@types/chrome": "^0.0.260",
+    "@types/dompurify": "^3.0.5",
+    "@types/node": "^20.11.16",
+    "@types/webextension-polyfill": "^0.10.7",
+    "@vitejs/plugin-vue": "^5.0.3",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.12",
+    "vue": "^3.4.15"
   }
 }

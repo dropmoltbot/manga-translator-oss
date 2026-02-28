@@ -12,7 +12,7 @@
 
 - 🔒 **100% Privacy-First**: No telemetry, no tracking, no data collection
 - 🧠 **Local OCR**: Tesseract.js WASM runs entirely in your browser
-- 🌍 **Multi-Provider Translation**: OpenAI, Anthropic, OpenRouter, Ollama, DeepL
+- 🌍 **Multi-Provider Translation**: OpenAI, Anthropic, OpenRouter, Ollama
 - 🎨 **Clean UI**: Shadow DOM isolation prevents CSS conflicts
 - ⚡ **Manifest V3**: Modern, secure, and ephemeral service workers
 - 🆓 **Zero Server Costs**: Bring your own API keys, no subscription
@@ -23,19 +23,18 @@
 
 ### From Source (Developer Mode)
 
-1. **Clone the repository**
 ```bash
 git clone https://github.com/dropmoltbot/manga-translator-oss.git
 cd manga-translator-oss
+pnpm install
+pnpm build
 ```
 
-2. **Load in Chrome/Edge/Brave**
-```
-Open chrome://extensions
-Enable "Developer mode"
-Click "Load unpacked"
-Select the project folder
-```
+Then load in Chrome:
+1. Open `chrome://extensions`
+2. Enable "Developer mode"
+3. Click "Load unpacked"
+4. Select the `dist/` folder
 
 ### ⚙️ Configuration
 
@@ -45,78 +44,34 @@ Select the project folder
 |----------|---------|------|----------|
 | OpenRouter | [openrouter.ai/keys](https://openrouter.ai/keys) | $0.14-$3/1M tokens | Best value, 200+ models |
 | OpenAI | [platform.openai.com/api-keys](https://platform.openai.com/api-keys) | $0.15-$5/1M tokens | High quality |
-| DeepL | [deepl.com/pro-api](https://www.deepl.com/pro-api) | $0.20-$2.50/1M tokens | Best European languages |
+| Anthropic | [console.anthropic.com](https://console.anthropic.com) | $3-$15/1M tokens | Best accuracy |
 | Ollama | [ollama.com](https://ollama.com) | Free (local) | 100% offline |
 
 2. **Configure Extension**
-
-Click the extension icon → Enter:
-- **Provider**: Choose your translation API
-- **API Key**: Paste your key (stored locally, encrypted by Chrome)
-- **Model**: Recommended models:
-  - OpenRouter: `anthropic/claude-3.5-sonnet` or `qwen/qwen-2.5-72b-instruct`
-  - OpenAI: `gpt-4o-mini`
-  - DeepL: `DeepL-Auth-Key`
-- **Target Language**: English, Français, Español, etc.
-
-### 📖 Usage
-
-**Method 1: Click on Image**
-1. Visit any manga/webtoon site
-2. Click 🗡️ on any image
-3. Wait for OCR + Translation (5-10 seconds)
-
-**Method 2: Auto-Detect**
-Enable auto-detect in settings → Images are automatically processed
+Click the extension icon → Enter your API key and select your provider.
 
 ---
 
 ## 🏗️ Architecture
 
 ```
-┌─────────────────────────────────────────────┐
-│ User clicks image                          │
-└────────────┬────────────────────────────────┘
-             ▼
-┌─────────────────────────────────────────────┐
-│ Content Script (content.js)                │
-│ - Detects image                            │
-│ - Shows loading indicator                  │
-└────────────┬────────────────────────────────┘
-             ▼
-┌─────────────────────────────────────────────┐
-│ OCR Engine (Tesseract.js WASM)             │
-│ - Recognizes Japanese/Korean/Chinese text  │
-└────────────┬────────────────────────────────┘
-             ▼
-┌─────────────────────────────────────────────┐
-│ Translation Service                        │
-│ - Calls configured API (OpenRouter/etc.)   │
-│ - Returns translated text                  │
-└────────────┬────────────────────────────────┘
-             ▼
-┌─────────────────────────────────────────────┐
-│ UI Layer                                    │
-│ - Overlay popup (CSS isolated)             │
-│ - Displays translation                      │
-└─────────────────────────────────────────────┘
+User clicks image → Content Script detects
+        ↓
+OCR (Tesseract.js WASM)
+        ↓
+Translation API (OpenAI/Anthropic/OpenRouter/Ollama)
+        ↓
+Shadow DOM overlay (CSS isolated)
 ```
 
 ---
 
 ## 🛡️ Privacy Guarantees
 
-This extension is designed with privacy-absolutism:
-
-- ✅ Zero telemetry - No analytics, no tracking pixels
+- ✅ Zero telemetry - No analytics
 - ✅ Zero remote code execution - All logic runs locally
-- ✅ Zero data collection - We never see your API keys or images
-- ✅ Minimal permissions - Only `storage`, `activeTab`, `scripting`
-- ✅ Open source - Audit the entire codebase yourself
-
-**What data leaves your browser?**
-
-Only the OCR-extracted text is sent to your configured translation API. Your API provider (OpenAI/Anthropic/etc.) may log requests per their policy. For 100% offline usage, use Ollama with local models.
+- ✅ Zero data collection - API keys stay on your device
+- ✅ Minimal permissions - Only `activeTab`, `storage`, `contextMenus`
 
 ---
 
@@ -125,28 +80,14 @@ Only the OCR-extracted text is sent to your configured translation API. Your API
 ```
 manga-translator-oss/
 ├── src/
-│   ├── background/       # Service worker (V3)
-│   ├── content/         # Content scripts (OCR, UI)
-│   ├── popup/           # Extension popup
-│   └── shared/          # Shared utilities
-├── .github/
-│   └── workflows/       # CI/CD automation
-├── manifest.json        # Chrome Extension manifest
-└── README.md           # This file
+│   ├── background/    # Service Worker
+│   ├── content/      # OCR & UI
+│   ├── popup/        # Vue popup config
+│   ├── options/      # Vue options page
+│   └── shared/       # Types, Storage, Translator
+├── .github/workflows/
+└── package.json
 ```
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome!
-
-Areas needing help:
-- Firefox compatibility testing
-- Safari extension port
-- UI/UX improvements
-- Support for more OCR languages (Korean, Chinese)
-- Manga-OCR ONNX integration (higher accuracy)
 
 ---
 
@@ -159,4 +100,4 @@ MIT License - See [LICENSE](LICENSE) for details.
 ## 🙏 Acknowledgments
 
 - [Tesseract.js](https://tesseract.projectnaptha.com/) - OCR engine
-- Inspired by Fakey Manga Translator
+- [webextension-polyfill](https://github.com/mozilla/webextension-polyfill) - Cross-browser compatibility
