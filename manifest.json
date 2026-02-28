@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Manga Translator OSS",
+  "version": "1.0.0",
+  "description": "Privacy-first, open-source manga/manhwa/manhua translator with local OCR",
+  "icons": {
+    "128": "icon.gif"
+  },
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}

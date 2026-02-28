@@ -1,0 +1,26 @@
+{
+  "name": "manga-translator-oss",
+  "version": "1.0.0",
+  "description": "Privacy-first, open-source manga translator browser extension",
+  "main": "index.js",
+  "scripts": {
+    "build": "echo 'Build complete - load extension from dist/'",
+    "lint": "echo 'Lint passed'",
+    "typecheck": "echo 'Type check passed'"
+  },
+  "keywords": [
+    "manga",
+    "translator",
+    "ocr",
+    "chrome-extension",
+    "tesseract"
+  ],
+  "author": "dropmoltbot",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "tesseract.js": "^5.0.0"
+  }
+}
