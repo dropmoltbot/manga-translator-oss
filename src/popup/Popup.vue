@@ -23,20 +23,6 @@ const languages = [
   { code: 'pt', name: 'Português' },
 ];
 
-onMounted(async () => {
-  activeProvider.value = await StorageService.getActiveProvider();
-  providerConfig.value = await StorageService.getProviderConfig();
-  const langs = await StorageService.getLanguages();
-  targetLanguage.value = langs.target;
-});
-
-async function saveConfig() {
-  await StorageService.setActiveProvider(activeProvider.value);
-  await StorageService.setProviderConfig(providerConfig.value);
-  await chrome.storage.local.set({ target_language: targetLanguage.value });
-  alert('✅ Configuration saved!');
-}
-
 function getModelPlaceholder(provider: TranslationProvider): string {
   switch (provider) {
     case 'openai': return 'gpt-4o-mini';
@@ -44,6 +30,41 @@ function getModelPlaceholder(provider: TranslationProvider): string {
     case 'openrouter': return 'anthropic/claude-3.5-sonnet';
     case 'ollama': return 'qwen2.5:32b';
     default: return 'model-name';
+  }
+}
+
+onMounted(async () => {
+  try {
+    const provider = await StorageService.getActiveProvider();
+    const config = await StorageService.getProviderConfig();
+    const langs = await StorageService.getLanguages();
+    
+    activeProvider.value = provider;
+    targetLanguage.value = langs.target;
+    
+    // Initialize provider config structure to prevent undefined errors
+    if (!config[provider]) {
+      if (provider === 'ollama') {
+        config.ollama = { baseUrl: 'http://localhost:11434', model: 'qwen2.5:32b' };
+      } else {
+        config[provider] = { apiKey: '', model: getModelPlaceholder(provider) };
+      }
+    }
+    providerConfig.value = config;
+  } catch (e) {
+    console.error('Failed to load config:', e);
+  }
+});
+
+async function saveConfig() {
+  try {
+    await StorageService.setActiveProvider(activeProvider.value);
+    await StorageService.setProviderConfig(providerConfig.value);
+    await chrome.storage.local.set({ target_language: targetLanguage.value });
+    alert('✅ Configuration saved!');
+  } catch (e) {
+    console.error('Failed to save config:', e);
+    alert('❌ Failed to save configuration');
   }
 }
 </script>
@@ -65,7 +86,7 @@ function getModelPlaceholder(provider: TranslationProvider): string {
       <label>API Key</label>
       <input 
         type="password" 
-        v-model="providerConfig[activeProvider]!.apiKey" 
+        v-model="providerConfig[activeProvider]?.apiKey" 
         placeholder="sk-..." 
         class="text-input" 
       />
@@ -75,7 +96,7 @@ function getModelPlaceholder(provider: TranslationProvider): string {
       <label>Base URL</label>
       <input 
         type="text" 
-        v-model="providerConfig.ollama!.baseUrl" 
+        v-model="providerConfig.ollama?.baseUrl" 
         placeholder="http://localhost:11434" 
         class="text-input" 
       />
@@ -85,7 +106,7 @@ function getModelPlaceholder(provider: TranslationProvider): string {
       <label>Model</label>
       <input 
         type="text" 
-        v-model="providerConfig[activeProvider]!.model" 
+        v-model="providerConfig[activeProvider]?.model" 
         :placeholder="getModelPlaceholder(activeProvider)" 
         class="text-input" 
       />
